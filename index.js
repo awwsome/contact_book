@@ -1,33 +1,60 @@
+/* eslint-disable no-console */
 // var express = require('express');
 // var mongoose = require('mongoose');
 import express from 'express';
 import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
+
 const app = express();
 
 // DB setting
-mongoose.set('useNewUrlParser', true);    // 1
-mongoose.set('useFindAndModify', false);  // 1
-mongoose.set('useCreateIndex', true);     // 1
+mongoose.set('useNewUrlParser', true); // 1
+mongoose.set('useFindAndModify', false); // 1
+mongoose.set('useCreateIndex', true); // 1
 mongoose.set('useUnifiedTopology', true); // 1
 mongoose.connect(process.env.MONGO_DB); // 2
-const db = mongoose.connection; //3
+const db = mongoose.connection; // 3
 
-//4
-db.once('open', function(){
-  console.log('DB connected');
-});
+db.once('open', () => { console.log('DB connected'); });
+db.on('error', (err) => { console.log('DB ERROR : ', err); });
 
-//5
-db.on('error', function(err){
-  console.log('DB ERROR : ', err);
-});
-
-// Other settings
 app.set('view engine', 'ejs');
-app.use(express.static(__dirname+'/public'));
+app.use(express.static(`${__dirname}/public`));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// DB Schema
+const contactSchema = mongoose.Schema(
+    {
+        name: { type: String, required: true, unique: true },
+        email: { type: String },
+        phone: { type: String },
+    },
+);
+const Contact = mongoose.model('contact', contactSchema);
+
+// Routes
+app.get('/', (req, res) => {
+    res.redirect('/contacts');
+});
+app.get('/contact', (req, res) => {
+    Contact.find({}, (err, contacts) => {
+        if (err) return res.json(err);
+        res.render('contacts/index', { contacts });
+    });
+});
+app.get('/contact/new', (req, res) => {
+    res.render('/contacts/new');
+});
+app.post('/contacts', (req, res) => {
+    Contact.create(req.body, (err, contact) => {
+        if (err) return res.json(err);
+        res.redirect('/contacts');
+    });
+});
 
 // Port setting
 const port = 3000;
-app.listen(port, function(){
-  console.log('server on! http://localhost:'+port);
+app.listen(port, () => {
+    console.log(`server on! http://localhost:${port}`);
 });
