@@ -4,6 +4,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
+import methodOverride from 'method-override';
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.set('view engine', 'ejs');
 app.use(express.static(`${__dirname}/public`));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(methodOverride('_method'));
 
 // DB Schema
 const contactSchema = mongoose.Schema(
