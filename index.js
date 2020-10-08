@@ -37,15 +37,16 @@ const Contact = mongoose.model('contact', contactSchema);
 app.get('/', (req, res) => {
     res.redirect('/contacts');
 });
-app.get('/contact', (req, res) => {
+app.get('/contacts', (req, res) => {
     Contact.find({}, (err, contacts) => {
         if (err) return res.json(err);
         res.render('contacts/index', { contacts });
     });
 });
-app.get('/contact/new', (req, res) => {
-    res.render('/contacts/new');
+app.get('/contacts/new', (req, res) => {
+    res.render('contacts/new');
 });
+
 app.post('/contacts', (req, res) => {
     Contact.create(req.body, (err, contact) => {
         if (err) return res.json(err);
