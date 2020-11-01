@@ -56,6 +56,34 @@ app.post('/contacts', (req, res) => {
     });
 });
 
+app.get('/contacts/:id', (req, res) => {
+    Contact.findOne({ _id: req.params.id }, (err, contact) => {
+        if (err) return res.json(err);
+        res.render('contacts/show', { contact });
+    });
+});
+
+app.get('/contacts/:id/edit', (req, res) => {
+    Contact.findOne({ _id: req.params.id }, (err, contact) => {
+        if (err) return res.json(err);
+        res.render('contacts/edit', { contact });
+    });
+});
+
+app.put('/contacts/:id', (req, res) => {
+    Contact.findOneAndUpdate({ _id: req.params.id }, req.body, (err) => {
+        if (err) return res.json(err);
+        res.redirect(`/contacts/${req.params.id}`);
+    });
+});
+
+app.delete('/contacts/:id', (req, res) => {
+    Contact.deleteOne({ _id: req.params.id }, (err) => {
+        if (err) return res.json(err);
+        res.redirect('/contacts');
+    });
+});
+
 // Port setting
 const port = 3000;
 app.listen(port, () => {
